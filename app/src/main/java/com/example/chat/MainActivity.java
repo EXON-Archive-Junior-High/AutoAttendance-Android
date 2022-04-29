@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("Login", "LoginBtnClick");
         DataOutputStream outstream = null;
         try {
+            Log.d("Socket", socket.toString());
             outstream = new DataOutputStream(socket.getOutputStream());
             String msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
             outstream.writeUTF(msg);

@@ -30,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     private Socket socket = null;
+    private String host = "127.0.0.1";
+    private int port = 6666;
 
     private Button mLoginBtn = null;
     private EditText mIdEdit = null;
@@ -40,9 +42,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ClientThread thread = new ClientThread();
-        thread.start();
-
+        // ClientThread thread = new ClientThread();
+        // thread.start();
 
         mLoginBtn = (Button)findViewById(R.id.button);
         mIdEdit = (EditText)findViewById(R.id.id_edit);
@@ -87,47 +88,60 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Log.d("Login", "LoginBtnClick");
-        DataOutputStream outstream = null;
-        try {
-            Log.d("Socket", socket.toString());
-            outstream = new DataOutputStream(socket.getOutputStream());
-            String msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
-            outstream.writeUTF(msg);
-            outstream.flush();
-            Log.d("ClientStream", "Sent Login to server");
+        Log.d("Login", "log");
+        ClientThread thread = new ClientThread();
+        thread.start();
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     class ClientThread extends Thread {
         @Override
         public void run() {
             try {
-                String host = "192.168.35.82";
-                int port = 6666;
                 socket = new Socket(host, port);
 
-                while (true) {
-                    DataInputStream instream = new DataInputStream(socket.getInputStream());
-                    byte[] buf = new byte[1024];
-                    int inputLength = instream.read(buf);
-                    String inputMessage = new String(buf, 0, inputLength);
-                    Log.d("ClientThread", "Received data: " + inputMessage);
+                DataOutputStream outstream = new DataOutputStream(socket.getOutputStream());
+                String msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
+                outstream.writeUTF(msg);
+                // Log.d("Message", msg.getBytes("UTF-8").toString());
+                outstream.flush();
+                Log.d("ClientStream", "Sent to server.");
 
-                    String[] msgList = inputMessage.split("/");
-                    if (msgList[0] == "Login") {
-                        if (msgList[1] == "Success") {
-                            Toast.makeText(getApplicationContext(), "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                        else if (msgList[1] == "Error") {
-                            Toast.makeText(getApplicationContext(), msgList[2], Toast.LENGTH_SHORT).show();
-                        }
+                DataInputStream instream = new DataInputStream(socket.getInputStream());
+                byte[] buf = new byte[1024];
+                int inputLength = instream.read(buf);
+                String inputMessage = new String(buf, 0, inputLength);
+                Log.d("ClientThread", "Received data: " + inputMessage);
+
+                String[] msgList = inputMessage.split("/");
+                if (msgList[0] == "Login") {
+                    if (msgList[1] == "Success") {
+                        Toast.makeText(getApplicationContext(), "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                    } else if (msgList[1] == "Error") {
+                        Toast.makeText(getApplicationContext(), msgList[2], Toast.LENGTH_SHORT).show();
                     }
                 }
+
+
+//                while (true) {
+//                    DataInputStream instream = new DataInputStream(socket.getInputStream());
+//                    byte[] buf = new byte[1024];
+//                    int inputLength = instream.read(buf);
+//                    String inputMessage = new String(buf, 0, inputLength);
+//                    Log.d("ClientThread", "Received data: " + inputMessage);
+//
+//                    String[] msgList = inputMessage.split("/");
+//                    if (msgList[0] == "Login") {
+//                        if (msgList[1] == "Success") {
+//                            Toast.makeText(getApplicationContext(), "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+//                        }
+//                        else if (msgList[1] == "Error") {
+//                            Toast.makeText(getApplicationContext(), msgList[2], Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }
             } catch (Exception e) {
+                Log.e("Error", "dd");
                 e.printStackTrace();
             }
         }

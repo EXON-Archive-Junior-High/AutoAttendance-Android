@@ -5,10 +5,13 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 
@@ -26,12 +29,18 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.LogRecord;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private Socket socket = null;
-    private String host = "127.0.0.1";
+    public Socket socket = null;
+    private String host = "192.168.0.138";
     private int port = 6666;
+
+    private final int LOGIN_SUCCESS = 0;
+    private final int LOGIN_ERROR = 1;
+
+    SendMessageHandler mHandler = null;
 
     private Button mLoginBtn = null;
     private EditText mIdEdit = null;
@@ -50,6 +59,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPasswordEdit = (EditText)findViewById(R.id.password_edit);
 
         mLoginBtn.setOnClickListener(this);
+        mHandler = new SendMessageHandler();
     }
 
     @Override
@@ -94,6 +104,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public class SendMessageHandler extends Handler {
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            switch (msg.what) {
+                case LOGIN_SUCCESS:
+                    Toast.makeText(MainActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                    break;
+                case LOGIN_ERROR:
+                    Toast.makeText(MainActivity.this, msg.getData().getString("msg"), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    }
+
     class ClientThread extends Thread {
         @Override
         public void run() {
@@ -101,7 +126,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 socket = new Socket(host, port);
 
                 DataOutputStream outstream = new DataOutputStream(socket.getOutputStream());
-                String msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
+                String msg = "";
+                msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
                 outstream.writeUTF(msg);
                 // Log.d("Message", msg.getBytes("UTF-8").toString());
                 outstream.flush();
@@ -114,11 +140,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d("ClientThread", "Received data: " + inputMessage);
 
                 String[] msgList = inputMessage.split("/");
-                if (msgList[0] == "Login") {
-                    if (msgList[1] == "Success") {
-                        Toast.makeText(getApplicationContext(), "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-                    } else if (msgList[1] == "Error") {
-                        Toast.makeText(getApplicationContext(), msgList[2], Toast.LENGTH_SHORT).show();
+                Message msgHandle = mHandler.obtainMessage();
+
+
+                if (msgList[0].equals("Login")) {
+                    if (msgList[1].equals("Success")) {
+                        msgHandle.what = LOGIN_SUCCESS;
+                        mHandler.sendMessage(msgHandle);
+                    } else if (msgList[1].equals("Error")) {
+                        msgHandle.what = LOGIN_ERROR;
+                        Bundle data = new Bundle();
+                        data.putString("msg", msgList[2]);
+                        msgHandle.setData(data);
+                        mHandler.sendMessage(msgHandle);
                     }
                 }
 

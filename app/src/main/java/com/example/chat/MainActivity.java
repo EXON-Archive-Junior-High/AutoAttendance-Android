@@ -1,5 +1,6 @@
 package com.example.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,7 +35,7 @@ import java.util.logging.LogRecord;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public Socket socket = null;
-    private String host = "192.168.0.138";
+    private String host = "192.168.0.124";
     private int port = 6666;
 
     private final int LOGIN_SUCCESS = 0;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mLoginBtn = null;
     private EditText mIdEdit = null;
     private EditText mPasswordEdit = null;
+
+    private boolean isConnected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +102,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         Log.d("Login", "log");
-        ClientThread thread = new ClientThread();
-        thread.start();
-
+        if (socket == null) {
+            ClientThread thread = new ClientThread();
+            thread.start();
+        }
     }
 
     public class SendMessageHandler extends Handler {
@@ -111,6 +115,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             switch (msg.what) {
                 case LOGIN_SUCCESS:
                     Toast.makeText(MainActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this,ChatActivity.class);
+                    startActivity(intent);//액티비티 띄우기
                     break;
                 case LOGIN_ERROR:
                     Toast.makeText(MainActivity.this, msg.getData().getString("msg"), Toast.LENGTH_SHORT).show();
@@ -119,42 +125,52 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
+
+
     class ClientThread extends Thread {
         @Override
         public void run() {
             try {
-                socket = new Socket(host, port);
+                if (!isConnected) {
+                    isConnected = true;
+                    socket = new Socket(host, port);
 
-                DataOutputStream outstream = new DataOutputStream(socket.getOutputStream());
-                String msg = "";
-                msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
-                outstream.writeUTF(msg);
-                // Log.d("Message", msg.getBytes("UTF-8").toString());
-                outstream.flush();
-                Log.d("ClientStream", "Sent to server.");
+                    DataOutputStream outstream = new DataOutputStream(socket.getOutputStream());
+                    String msg = "";
+                    msg = "Login/" + mIdEdit.getText().toString() + "/" + mPasswordEdit.getText().toString();
+                    outstream.writeUTF(msg);
+                    // Log.d("Message", msg.getBytes("UTF-8").toString());
+                    outstream.flush();
+                    Log.d("ClientStream", "Sent to server.");
 
-                DataInputStream instream = new DataInputStream(socket.getInputStream());
-                byte[] buf = new byte[1024];
-                int inputLength = instream.read(buf);
-                String inputMessage = new String(buf, 0, inputLength);
-                Log.d("ClientThread", "Received data: " + inputMessage);
+                    DataInputStream instream = new DataInputStream(socket.getInputStream());
+                    byte[] buf = new byte[1024];
+                    int inputLength = instream.read(buf);
+                    String inputMessage = new String(buf, 0, inputLength);
+                    Log.d("ClientThread", "Received data: " + inputMessage);
 
-                String[] msgList = inputMessage.split("/");
-                Message msgHandle = mHandler.obtainMessage();
+                    String[] msgList = inputMessage.split("/");
+                    Message msgHandle = mHandler.obtainMessage();
 
 
-                if (msgList[0].equals("Login")) {
-                    if (msgList[1].equals("Success")) {
-                        msgHandle.what = LOGIN_SUCCESS;
-                        mHandler.sendMessage(msgHandle);
-                    } else if (msgList[1].equals("Error")) {
-                        msgHandle.what = LOGIN_ERROR;
-                        Bundle data = new Bundle();
-                        data.putString("msg", msgList[2]);
-                        msgHandle.setData(data);
-                        mHandler.sendMessage(msgHandle);
+                    if (msgList[0].equals("Login")) {
+                        if (msgList[1].equals("Success")) {
+                            msgHandle.what = LOGIN_SUCCESS;
+                            mHandler.sendMessage(msgHandle);
+                        } else if (msgList[1].equals("Error")) {
+                            isConnected = false;
+                            msgHandle.what = LOGIN_ERROR;
+                            Bundle data = new Bundle();
+                            data.putString("msg", msgList[2]);
+                            msgHandle.setData(data);
+                            mHandler.sendMessage(msgHandle);
+                        }
                     }
                 }
+
 
 
 //                while (true) {

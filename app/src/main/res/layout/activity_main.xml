@@ -25,6 +25,7 @@
             android:layout_below="@id/logo"
             android:layout_marginTop="120dp"
             android:id="@+id/linnearId"
+            android:orientation="horizontal"
             >
 
             <TextView

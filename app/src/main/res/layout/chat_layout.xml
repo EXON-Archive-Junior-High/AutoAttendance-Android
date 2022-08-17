@@ -57,9 +57,26 @@
                 android:text="send"
                 android:layout_marginRight="10dp"
                 android:background="@drawable/button_style"
-                android:id="@+id/send_button"
+                android:id="@+id/send_button1"
                 />
-
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="A to S"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/button_style"
+                android:id="@+id/send_button2"
+                />
+            <androidx.appcompat.widget.AppCompatButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="S to A"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/button_style"
+                android:id="@+id/send_button3"
+                />
         </LinearLayout>
 
     </LinearLayout>

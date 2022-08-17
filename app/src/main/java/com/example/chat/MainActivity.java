@@ -69,11 +69,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPasswordEdit.setText("1");
 
         // Start Socket Service
-        Intent intent = new Intent( getApplicationContext(),//현재제어권자
-                socketService.class); // 이동할 컴포넌트
-        intent.putExtra("id", mIdEdit.getText().toString());
-        intent.putExtra("pwd", mPasswordEdit.getText().toString());
-        startService(intent); // 서비스 시작
+//        Intent intent = new Intent( getApplicationContext(),//현재제어권자
+//                socketService.class); // 이동할 컴포넌트
+//        intent.putExtra("id", mIdEdit.getText().toString());
+//        intent.putExtra("pwd", mPasswordEdit.getText().toString());
+//        startService(intent); // 서비스 시작
 
     }
 
@@ -192,25 +192,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
 
-
-
-//                while (true) {
-//                    DataInputStream instream = new DataInputStream(socket.getInputStream());
-//                    byte[] buf = new byte[1024];
-//                    int inputLength = instream.read(buf);
-//                    String inputMessage = new String(buf, 0, inputLength);
-//                    Log.d("ClientThread", "Received data: " + inputMessage);
-//
-//                    String[] msgList = inputMessage.split("/");
-//                    if (msgList[0] == "Login") {
-//                        if (msgList[1] == "Success") {
-//                            Toast.makeText(getApplicationContext(), "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-//                        }
-//                        else if (msgList[1] == "Error") {
-//                            Toast.makeText(getApplicationContext(), msgList[2], Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-//                }
             } catch (Exception e) {
                 Log.e("Error", "dd");
                 e.printStackTrace();

@@ -35,13 +35,14 @@ import java.util.logging.LogRecord;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public Socket socket = null;
-    private String host = "192.168.35.82";
+    private String host = "192.168.0.131";
     private int port = 6666;
 
     private final int LOGIN_SUCCESS = 0;
     private final int LOGIN_ERROR = 1;
+    private final int SERVER_ERROR = 2;
 
-    private SendMessageHandler mHandler = null;
+    SendMessageHandler mHandler = null;
 
     private Button mLoginBtn = null;
     private EditText mIdEdit = null;
@@ -63,29 +64,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mLoginBtn.setOnClickListener(this);
         mHandler = new SendMessageHandler();
-
-        // just test
-        mIdEdit.setText("1");
-        mPasswordEdit.setText("1");
-
-        // Start Socket Service
-//        Intent intent = new Intent( getApplicationContext(),//현재제어권자
-//                socketService.class); // 이동할 컴포넌트
-//        intent.putExtra("id", mIdEdit.getText().toString());
-//        intent.putExtra("pwd", mPasswordEdit.getText().toString());
-//        startService(intent); // 서비스 시작
-
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if( intent != null) {
-            String Msg = intent.getStringExtra("msg");
-            Toast.makeText(MainActivity.this, "Service 에서 전달된 Msg = ." + Msg, Toast.LENGTH_SHORT).show();
-        }
-
-    }
     @Override
     protected void onPause(){
         super.onPause();
@@ -136,12 +116,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             switch (msg.what) {
                 case LOGIN_SUCCESS:
                     Toast.makeText(MainActivity.this, "로그인에 성공하였습니다.", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this,ChatActivity.class);
-                    startActivity(intent);//액티비티 띄우기
+                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                    intent.putExtra("id", msg.getData().getString("id"));
+                    intent.putExtra("pwd", msg.getData().getString("pwd"));
+                    if(socket != null){
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            Toast.makeText(MainActivity.this, "서버를 확인해주세요!.", Toast.LENGTH_SHORT).show();
+                        }
+                        socket = null;
+                    }
+                    startActivity(intent); //액티비티 띄우기
                     break;
                 case LOGIN_ERROR:
                     Toast.makeText(MainActivity.this, msg.getData().getString("msg"), Toast.LENGTH_SHORT).show();
                     break;
+                case SERVER_ERROR:
+                    Toast.makeText(MainActivity.this, "서버를 확인해주세요.", Toast.LENGTH_SHORT).show();
+                    break;
+
             }
         }
     }
@@ -180,6 +175,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (msgList[0].equals("Login")) {
                         if (msgList[1].equals("Success")) {
                             msgHandle.what = LOGIN_SUCCESS;
+                            Bundle data = new Bundle();
+                            data.putString("id", mIdEdit.getText().toString());
+                            data.putString("pwd", mPasswordEdit.getText().toString());
+                            msgHandle.setData(data);
                             mHandler.sendMessage(msgHandle);
                         } else if (msgList[1].equals("Error")) {
                             isConnected = false;
@@ -191,9 +190,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 }
-
             } catch (Exception e) {
+                Message msgHandle = mHandler.obtainMessage();
+                msgHandle.what = SERVER_ERROR;
+                mHandler.sendMessage(msgHandle);
                 Log.e("Error", "dd");
+
                 e.printStackTrace();
             }
         }

@@ -45,6 +45,7 @@
                 android:layout_toRightOf="@id/id"
                 android:layout_marginLeft="10dp"
                 android:width="200dp"
+                android:text="1"
                 android:id="@+id/id_edit"
                 />
 
@@ -75,6 +76,7 @@
                 android:layout_toRightOf="@id/id"
                 android:layout_marginLeft="10dp"
                 android:width="200dp"
+                android:text="1"
                 android:id="@+id/password_edit"
                 />
         </LinearLayout>

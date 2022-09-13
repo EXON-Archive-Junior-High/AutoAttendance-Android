@@ -66,10 +66,10 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
 
     private void processIntent(Intent intent) {
         if (intent != null) {
-            String chat = intent.getStringExtra("chat");
-            String name = intent.getStringExtra("list");
+            String chat = intent.getStringExtra("type");
+            String name = intent.getStringExtra("msg");
 
-            Toast.makeText(this, "chat : " + chat + ", name : " + name, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "type : " + chat + ", msg : " + name, Toast.LENGTH_LONG).show();
         }
     }
     @Override

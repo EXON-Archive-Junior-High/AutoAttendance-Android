@@ -35,7 +35,7 @@ import java.util.logging.LogRecord;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public Socket socket = null;
-    private String host = "192.168.0.131";
+    private String host = "192.168.35.188";
     private int port = 6666;
 
     private final int LOGIN_SUCCESS = 0;
@@ -170,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     String[] msgList = inputMessage.split("/");
                     Message msgHandle = mHandler.obtainMessage();
-
 
                     if (msgList[0].equals("Login")) {
                         if (msgList[1].equals("Success")) {

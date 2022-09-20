@@ -12,6 +12,8 @@ import android.os.Messenger;
 import android.os.RemoteException;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +25,7 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
     Socket mSocket = null;
     private boolean mIsBound;
     private Messenger mServiceMessenger = null;
-    private AppCompatButton testBtn1 = null;
+    private AppCompatButton sendMessageBtn = null;
     private AppCompatButton testBtn2 = null;
     private socketService mBindService;
     private String userId = null;
@@ -50,12 +52,8 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
         intent.putExtra("pwd", userPwd);
         startService(intent); // Service에 데이터를 전달한다.
 
-        // test
-        testBtn1 = (AppCompatButton)findViewById(R.id.send_button2);
-        testBtn2 = (AppCompatButton)findViewById(R.id.send_button3);
-        testBtn1.setOnClickListener(this);
-        testBtn2.setOnClickListener(this);
-
+        sendMessageBtn = (AppCompatButton)findViewById(R.id.send_button);
+        sendMessageBtn.setOnClickListener(this);
     }
 
     @Override
@@ -67,19 +65,31 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
 
     private void processIntent(Intent intent) {
         if (intent != null) {
-            String chat = intent.getStringExtra("type");
-            String name = intent.getStringExtra("msg");
+            String type = intent.getStringExtra("type");
 
-            Toast.makeText(this, "type : " + chat + ", msg : " + name, Toast.LENGTH_LONG).show();
+            if (type != null) {
+                if (type.equals("Chat")) {
+                    String msg = intent.getStringExtra("msg");
+                    TextView textView = (TextView)findViewById(R.id.chatbox);
+                    textView.append(msg);
+                }
+            }
+
+
+            // Toast.makeText(this, "type : " + chat + ", msg : " + name, Toast.LENGTH_LONG).show();
         }
     }
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.send_button2: // "A to S"
-                Toast.makeText(ChatActivity.this, "A to S", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.send_button3: // "S to A"
+            case R.id.send_button:
+                EditText editText = (EditText)findViewById(R.id.text_edit);
+                Intent intent = new Intent(getApplicationContext(), socketService.class);
+                intent.putExtra("type", "chat");
+                Log.d("log", editText.getText().toString());
+                intent.putExtra("msg", editText.getText().toString());
+                startService(intent); // Service에 데이터를 전달한다.
+                Toast.makeText(ChatActivity.this, "채팅을 보냈습니다.", Toast.LENGTH_SHORT).show();
                 break;
         }
     }

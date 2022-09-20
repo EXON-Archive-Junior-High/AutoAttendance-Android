@@ -31,7 +31,7 @@ public class socketService  extends Service {
     public static final int SOCKET_RECV_LOGIN = 2;
 
     public Socket socket = null;
-    private String host = "192.168.0.127";
+    private String host = "192.168.35.188";
     private int port = 6666;
 
     private final int FRIEND_REQUEST = 0;
@@ -77,7 +77,8 @@ public class socketService  extends Service {
 
     private void processCommand(Intent intent) {
         String sType = intent.getStringExtra("type");
-        if(sType.equals("start")) {
+        if (sType.equals("start")) {
+            // 서비스 처음 시작할 때
             String sId = intent.getStringExtra("id");
             String sPwd = intent.getStringExtra("pwd");
             if (sId != null) this.mId = sId;
@@ -85,14 +86,15 @@ public class socketService  extends Service {
             Log.d(TAG, "id : " + sId + ", pwd : " + sPwd);
             ClientThread thread = new ClientThread();
             thread.start();
-        } else if(sType.equals("chat")) {
-
+        } else if (sType.equals("chat")) {
+            // 채팅 보낼 때
             String sMsg = intent.getStringExtra("msg");
-            serverSendThread thread = new serverSendThread(SEND_SERVER,sMsg);
+            serverSendThread thread = new serverSendThread(SEND_SERVER, sMsg);
             thread.start();
 
-        } else if(sType.equals("friend")) {
-            serverSendThread thread = new serverSendThread(FRIEND_REQUEST,null);
+        } else if (sType.equals("friend")) {
+            // 친구 목록 요청 할 때
+            serverSendThread thread = new serverSendThread(FRIEND_REQUEST, null);
             thread.start();
         }
     }
@@ -115,16 +117,14 @@ public class socketService  extends Service {
                     DataOutputStream outstream = new DataOutputStream(socket.getOutputStream());
                     String msg = "";
                     outstream = new DataOutputStream(socket.getOutputStream());
-                    if(mType == FRIEND_REQUEST) {
-                        msg = "FriendList/Get";
-                    } else if(mType == SEND_SERVER) {
-                        msg = "Chat/Send/"+mMsg;
-                    }
+                    if (mType == FRIEND_REQUEST) msg = "FriendList/Get";
+                    else if(mType == SEND_SERVER) msg = "Chat/Send/" + mMsg;
 
                     outstream.writeUTF(msg);
                     outstream.flush();
                 }
             } catch (Exception e) {
+
             }
         }
     }

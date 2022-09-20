@@ -35,7 +35,7 @@ import java.util.logging.LogRecord;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public Socket socket = null;
-    private String host = "192.168.0.127";
+    private String host = "192.168.35.188";
     private int port = 6666;
 
     private final int LOGIN_SUCCESS = 0;
@@ -119,14 +119,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                     intent.putExtra("id", msg.getData().getString("id"));
                     intent.putExtra("pwd", msg.getData().getString("pwd"));
-                    if(socket != null){
-                        try {
-                            socket.close();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                            Toast.makeText(MainActivity.this, "서버를 확인해주세요!.", Toast.LENGTH_SHORT).show();
-                        }
-                        socket = null;
+                    try {
+                        socket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Toast.makeText(MainActivity.this, "서버를 확인해주세요!.", Toast.LENGTH_SHORT).show();
                     }
                     startActivity(intent); //액티비티 띄우기
                     break;

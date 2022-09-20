@@ -31,11 +31,12 @@ public class socketService  extends Service {
     public static final int SOCKET_RECV_LOGIN = 2;
 
     public Socket socket = null;
-    private String host = "192.168.35.188";
+    private String host = "192.168.0.127";
     private int port = 6666;
 
     private final int FRIEND_REQUEST = 0;
-    private final int SENDACTIVITY = 1;
+    private final int SEND_ACTIVITY = 1;
+    private final int SEND_SERVER = 2;
     private final int LOGIN_SUCCESS = 0;
     private final int LOGIN_ERROR = 1;
 
@@ -75,51 +76,53 @@ public class socketService  extends Service {
     }
 
     private void processCommand(Intent intent) {
-        String sId = intent.getStringExtra("id");
-        String sPwd = intent.getStringExtra("pwd");
+        String sType = intent.getStringExtra("type");
+        if(sType.equals("start")) {
+            String sId = intent.getStringExtra("id");
+            String sPwd = intent.getStringExtra("pwd");
+            if (sId != null) this.mId = sId;
+            if (sPwd != null) this.mPwd = sPwd;
+            Log.d(TAG, "id : " + sId + ", pwd : " + sPwd);
+            ClientThread thread = new ClientThread();
+            thread.start();
+        } else if(sType.equals("chat")) {
 
-        if (sId != null) {
-            this.mId = sId;
-        }
-        if (sPwd != null) {
-            this.mPwd = sPwd;
-        }
-        Log.d(TAG, "id : " + sId + ", pwd : " + sPwd);
+            String sMsg = intent.getStringExtra("msg");
+            serverSendThread thread = new serverSendThread(SEND_SERVER,sMsg);
+            thread.start();
 
-        ClientThread thread = new ClientThread();
-        thread.start();
-//        Intent showIntent = new Intent(getApplicationContext(), ChatActivity.class);
-//        showIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-//                Intent.FLAG_ACTIVITY_SINGLE_TOP |
-//                Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        showIntent.putExtra("chat", "hahahahaha");
-//        showIntent.putExtra("list", " person list");
-//        startActivity(showIntent); // Service에서 Activity로 데이터를 전달
+        } else if(sType.equals("friend")) {
+            serverSendThread thread = new serverSendThread(FRIEND_REQUEST,null);
+            thread.start();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
     }
-    class FriendRequestThread extends Thread {
+    class serverSendThread extends Thread {
+        private int mType = 0;
+        private String mMsg = "";
+        public serverSendThread(int type,String msg){
+            mType = type;
+            mMsg = msg;
+        }
         @Override
         public void run() {
             try {
-
                 if (mLoginFlag) {
-
                     DataOutputStream outstream = new DataOutputStream(socket.getOutputStream());
                     String msg = "";
-
-                    while(mLoginFlag) {
-                        Thread.sleep(1000 * 60);
-
-                        outstream = new DataOutputStream(socket.getOutputStream());
+                    outstream = new DataOutputStream(socket.getOutputStream());
+                    if(mType == FRIEND_REQUEST) {
                         msg = "FriendList/Get";
-                        outstream.writeUTF(msg);
-                        outstream.flush();
+                    } else if(mType == SEND_SERVER) {
+                        msg = "Chat/Send/"+mMsg;
                     }
 
+                    outstream.writeUTF(msg);
+                    outstream.flush();
                 }
             } catch (Exception e) {
             }
@@ -154,8 +157,8 @@ public class socketService  extends Service {
                     if (msgList[0].equals("Login")) {
                         if (msgList[1].equals("Success")) {
                             mLoginFlag = true;
-                            msgHandle.what = FRIEND_REQUEST;
-                            mHandler.sendMessage(msgHandle);
+                            //msgHandle.what = FRIEND_REQUEST;
+                            //mHandler.sendMessage(msgHandle);
                         } else if (msgList[1].equals("Error")) {
                             mLoginFlag = false;
                         }
@@ -169,14 +172,14 @@ public class socketService  extends Service {
                         msgList = inputMessage.split("/");
                         msgHandle = mHandler.obtainMessage();
                         if (msgList[0].equals("Chat")) {
-                            msgHandle.what = SENDACTIVITY;
+                            msgHandle.what = SEND_ACTIVITY;
                             Bundle data = new Bundle();
                             data.putString("type", msgList[0]);
                             data.putString("msg", msgList[2]);
                             msgHandle.setData(data);
                             mHandler.sendMessage(msgHandle);
                         } else if (msgList[0].equals("FriendList")) {
-                            msgHandle.what = SENDACTIVITY;
+                            msgHandle.what = SEND_ACTIVITY;
                             Bundle data = new Bundle();
                             data.putString("type", msgList[0]);
                             data.putString("msg", msgList[2]);
@@ -199,11 +202,7 @@ public class socketService  extends Service {
             super.handleMessage(msg);
 
             switch (msg.what) {
-                case FRIEND_REQUEST:
-                    FriendRequestThread thread = new FriendRequestThread();
-                    thread.start();
-                    break;
-                case SENDACTIVITY:
+                case SEND_ACTIVITY:
                     Intent showIntent = new Intent(getApplicationContext(), ChatActivity.class);
                     showIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
                                         Intent.FLAG_ACTIVITY_SINGLE_TOP |

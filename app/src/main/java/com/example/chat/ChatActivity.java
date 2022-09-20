@@ -45,6 +45,7 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
         processIntent(passedIntent);
 
         Intent intent = new Intent(getApplicationContext(), socketService.class);
+        intent.putExtra("type", "start");
         intent.putExtra("id", userId);
         intent.putExtra("pwd", userPwd);
         startService(intent); // Service에 데이터를 전달한다.

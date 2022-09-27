@@ -125,7 +125,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         e.printStackTrace();
                         Toast.makeText(MainActivity.this, "서버를 확인해주세요!.", Toast.LENGTH_SHORT).show();
                     }
-                    startActivity(intent); //액티비티 띄우기
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Thread.sleep(1000);
+                                startActivity(intent); //액티비티 띄우기
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
                     break;
                 case LOGIN_ERROR:
                     Toast.makeText(MainActivity.this, msg.getData().getString("msg"), Toast.LENGTH_SHORT).show();

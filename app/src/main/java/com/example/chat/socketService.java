@@ -103,10 +103,11 @@ public class socketService  extends Service {
     public void onDestroy() {
         super.onDestroy();
     }
+
     class serverSendThread extends Thread {
         private int mType = 0;
         private String mMsg = "";
-        public serverSendThread(int type,String msg){
+        public serverSendThread(int type, String msg){
             mType = type;
             mMsg = msg;
         }
@@ -118,7 +119,7 @@ public class socketService  extends Service {
                     String msg = "";
                     outstream = new DataOutputStream(socket.getOutputStream());
                     if (mType == FRIEND_REQUEST) msg = "FriendList/Get";
-                    else if(mType == SEND_SERVER) msg = "Chat/Send/" + mMsg;
+                    else if (mType == SEND_SERVER) msg = "Chat/Send/" + mMsg;
 
                     outstream.writeUTF(msg);
                     outstream.flush();

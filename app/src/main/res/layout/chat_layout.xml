@@ -10,37 +10,29 @@
         android:layout_height="match_parent"
         tools:ignore="MissingConstraints">
 
-        <LinearLayout
-            android:orientation="horizontal"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="9">
+            android:text="hello"
+            android:layout_weight="9"
+            android:layout_margin="20dp"
+            android:id="@+id/chatbox">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="8"
-                android:text="hello"
-                android:layout_margin="20dp"
-                android:id="@+id/chatbox">
-
-            </TextView>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:text="hello"
-                android:layout_margin="20dp"
-                android:id="@+id/friend_list">
-
-            </TextView>
-        </LinearLayout>
+        </TextView>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/user_edit"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="5"
+                android:layout_margin="10dp"
+                />
 
             <EditText
                 android:layout_width="wrap_content"

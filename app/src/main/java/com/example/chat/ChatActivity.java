@@ -84,10 +84,11 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
         switch (view.getId()) {
             case R.id.send_button:
                 EditText editText = (EditText)findViewById(R.id.text_edit);
+                EditText editUser = (EditText)findViewById(R.id.user_edit);
                 Intent intent = new Intent(getApplicationContext(), socketService.class);
                 intent.putExtra("type", "chat");
-                Log.d("log", editText.getText().toString());
-                intent.putExtra("msg", editText.getText().toString());
+                Log.d("log", editUser.getText().toString() + "/" + editText.getText().toString());
+                intent.putExtra("msg", editUser.getText().toString() + "/" + editText.getText().toString());
                 startService(intent); // Service에 데이터를 전달한다.
                 Toast.makeText(ChatActivity.this, "채팅을 보냈습니다.", Toast.LENGTH_SHORT).show();
                 break;

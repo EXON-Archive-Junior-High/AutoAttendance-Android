@@ -71,7 +71,7 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
                 if (type.equals("Chat")) {
                     String msg = intent.getStringExtra("msg");
                     TextView textView = (TextView)findViewById(R.id.chatbox);
-                    textView.append(msg);
+                    textView.append(msg + "\n");
                 }
             }
 

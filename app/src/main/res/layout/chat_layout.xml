@@ -13,7 +13,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="hello"
+            android:text=""
             android:layout_weight="9"
             android:layout_margin="20dp"
             android:id="@+id/chatbox">
@@ -30,8 +30,9 @@
                 android:id="@+id/user_edit"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_weight="5"
+                android:layout_weight="3"
                 android:layout_margin="10dp"
+                android:text="all"
                 />
 
             <EditText
@@ -45,7 +46,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="send"
+                android:text="보내기"
                 android:layout_marginRight="10dp"
                 android:background="@drawable/button_style"
                 android:id="@+id/send_button"

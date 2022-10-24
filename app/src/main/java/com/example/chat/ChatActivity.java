@@ -72,6 +72,10 @@ public class ChatActivity extends AppCompatActivity  implements View.OnClickList
                     String msg = intent.getStringExtra("msg");
                     TextView textView = (TextView)findViewById(R.id.chatbox);
                     textView.append(msg + "\n");
+                } else if (type.equals("Schedule")) {
+                    String msg = intent.getStringExtra("msg");
+                    TextView textView = (TextView)findViewById(R.id.chatbox);
+                    textView.append(msg + "\n");
                 }
             }
 

@@ -186,6 +186,13 @@ public class socketService  extends Service {
                             data.putString("msg", msgList[2]);
                             msgHandle.setData(data);
                             mHandler.sendMessage(msgHandle);
+                        } else if (msgList[0].equals("Schedule")) {
+                            msgHandle.what = SEND_ACTIVITY;
+                            Bundle data = new Bundle();
+                            data.putString("type", msgList[0]);
+                            data.putString("msg", msgList[2]);
+                            msgHandle.setData(data);
+                            mHandler.sendMessage(msgHandle);
                         }
                     }
 
